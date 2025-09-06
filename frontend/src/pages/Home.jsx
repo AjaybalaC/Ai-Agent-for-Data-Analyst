@@ -10,33 +10,58 @@ const Home = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
   setLoading(true);
+
   try {
     const response = await axios.post('http://localhost:5000/api/collect', { query });
-    const item = response.data.data; 
+    const item = response.data.data;  
 
     const combinedResults = [];
 
-    if (item.rawData) {
-      
-      if (item.rawData.tavily && item.rawData.tavily.results) {
-        item.rawData.tavily.results.forEach(res => {
-          combinedResults.push({
-            source: 'Tavily',
-            title: res.title,
-            link: res.url,
-            snippet: res.content
-          });
+    if (item.search_overview) {
+      combinedResults.push({
+        title: "Search Overview",
+        link: null,
+        snippet: item.search_overview
+      });
+    }
+
+
+    if (item.company_profiles && item.company_profiles.length > 0) {
+      item.company_profiles.forEach(profile => {
+        combinedResults.push({
+          title: `Company: ${profile.name}`,
+          link: null,
+          snippet: profile.description
         });
-      }
+      });
+    }
+
+   
+    if (item.comparative_analysis) {
+      combinedResults.push({
+        title: "Comparative Analysis",
+        link: null,
+        snippet: item.comparative_analysis
+      });
+    }
+
+ 
+    if (item.market_trends) {
+      combinedResults.push({
+        title: "Market Trends",
+        link: null,
+        snippet: item.market_trends
+      });
     }
 
     setResults(combinedResults);
   } catch (error) {
     console.error("Error in handleSubmit:", error.message);
   }
+
   setLoading(false);
 };
 
@@ -95,9 +120,8 @@ const Home = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  {/* <TableCell>Source</TableCell> */}
+
                   <TableCell>Title</TableCell>
-                  <TableCell>Link</TableCell>
                   <TableCell>Snippet</TableCell>
                 </TableRow>
               </TableHead>
@@ -105,9 +129,6 @@ const Home = () => {
                 {results.map((item, index) => (
                   <TableRow key={index}>
                     <TableCell>{item.title}</TableCell>
-                    <TableCell>
-                      {item.link ? <a href={item.link} target="_blank" rel="noopener noreferrer">Link</a> : '-'}
-                    </TableCell>
                     <TableCell>{item.snippet || '-'}</TableCell>
                   </TableRow>
                 ))}
