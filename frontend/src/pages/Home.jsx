@@ -69,7 +69,7 @@ const handleSubmit = async (e) => {
   const exportToCSV = () => {
     if (!results.length) return;
 
-    const headers = [ "Title", "Link", "Snippet"];
+    const headers = [ "Title","Snippet"];
     const rows = results.map(r => [
       `"${r.title.replace(/"/g, '""')}"`,
       r.link,
